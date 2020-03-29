@@ -76,3 +76,4 @@ yargs.command({
 // add, remove, read, list
 
 yargs.parse()
+console.log(chalk.red.inverse('For Elena with love <3'))

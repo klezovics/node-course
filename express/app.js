@@ -1,7 +1,7 @@
 const express = require('express')
 const request = require('request')
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000;
 
 app.get('/', ({query}, res) => {
 
@@ -12,6 +12,7 @@ app.get('/', ({query}, res) => {
     }
 
     res.send(responseData)
+
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
