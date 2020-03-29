@@ -28,7 +28,26 @@ app.get('/help', (req, res) => {
 })
 
 app.get('/weather', (req, res) => {
-    res.send({forecase:'Sunny', location: 'Berlin',  name: 'AK'})
+
+    let address = req.query.address
+
+    if(!address) {
+        return res.send({
+            error: 'Address must be provided'
+        })
+      }
+
+    res.send({forecase:'Sunny', location: address})
+})
+
+app.get('/products', (req, res) => {
+    if(!req.query.search) {
+      return res.send({
+          error: 'Provide search term'
+      })
+    }
+
+    res.send({productions: []} )
 })
 
 app.get('/help/*',(req,res) => {
