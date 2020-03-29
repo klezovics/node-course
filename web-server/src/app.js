@@ -1,30 +1,42 @@
 const path = require('path')
 const express = require('express')
+const hbs = require('hbs')
 
 const app = express()
-
-const staticResourceFolder = path.join(__dirname,'..','public')
-
-
 const port = 3000
-let count=0;
 
-app.use(express.static(staticResourceFolder))
+const viewsPath = path.join(__dirname,'..','templates','views')
+const partialsPath = path.join(__dirname,'..','templates','partials')
 
+app.set('view engine','hbs')
+app.set('views',viewsPath)
+hbs.registerPartials(partialsPath)
 
-// app.get('/help', (req, res) => {
-//     count++
-//     res.send({helpMsg: "Help is here"})
-// })
+const staticResourcePath = path.join(__dirname,'..','public')
+app.use(express.static(staticResourcePath))
 
-// app.get('/about', (req, res) => {
-//     count++
-//     res.send('<h2>This is an app</h2>')
-// })
+app.get('',(req,res) => {
+    res.render('index',{title:'Weather App', name: 'AK'})
+})
+
+app.get('/about', (req, res) => {
+    res.render('about',{title:'About page', info:'This is some about info', name: 'AK'})
+})
+
+app.get('/help', (req, res) => {
+    res.render('help',{title:'Help page', info:'You can find help info here', name: 'AK'})
+})
 
 app.get('/weather', (req, res) => {
-    count++
-    res.send({forecase:'Sunny', location: 'Berlin'})
+    res.send({forecase:'Sunny', location: 'Berlin',  name: 'AK'})
+})
+
+app.get('/help/*',(req,res) => {
+    res.render('not-found-help', {title: 'Help page not found', name: 'AK1'})
+ })
+
+app.get('*',(req,res) => {
+   res.render('not-found', {title: 'Page not found', name: 'AK'})
 })
 
 app.listen(port, () => {
