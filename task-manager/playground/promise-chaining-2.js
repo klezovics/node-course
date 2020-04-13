@@ -14,3 +14,14 @@ Task.countDocuments({ completed: false }).then((result) => {
     console.log("Incomplete tasks" + result)
   })
 
+
+const processTasks = async (id,completed) => {
+  c1 = await Task.countDocuments(completed)
+  t = await Task.findByIdAndDelete(id)
+  c2 = await Task.countDocuments(completed)
+  console.log("c1:"+c1)
+  console.log("t:"+t)
+  console.log("c2"+c2)
+}
+
+processTasks('5e93740228736baef0642973',false)
