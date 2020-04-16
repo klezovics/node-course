@@ -1,9 +1,15 @@
 const express=require('express')
 const router = new express.Router()
 const Task = require('../models/task.js')
+const auth = require('../middleware/auth')
 
-router.post("/tasks", async ({ body }, res) => {
-    const task = new Task(body)
+
+router.post("/tasks", auth, async (req, res) => {
+    const task = new Task({
+        ...req.body,
+        owner: req.user._id
+    })
+
 
     try {
         await task.save()
@@ -15,10 +21,11 @@ router.post("/tasks", async ({ body }, res) => {
     }
 })
 
-router.get("/tasks", async (req, res) => {
+router.get("/tasks",auth,async (req, res) => {
+    const user = req.user
 
     try {
-        tasks = await Task.find({})
+        tasks = await Task.find({owner:user._id})
         res.send(tasks)
     } catch (e) {
         console.log(e)
@@ -26,11 +33,11 @@ router.get("/tasks", async (req, res) => {
     }
 })
 
-router.get("/tasks/:id", async (req, res) => {
+router.get("/tasks/:id",auth, async (req, res) => {
     const _id = req.params.id
 
     try {
-        const task = await Task.findById(_id)
+        const task = await Task.findOne({_id,owner:req.user._id})
         if (!task) {
             return res.status(400).send()
         }
@@ -54,20 +61,29 @@ router.patch("/tasks/:id", async (req, res) => {
     }
 
     try {
-        const task = await Task.findByIdAndUpdate(_id,req.body,{new:true, runValidators: true})
+        let task = await Task.findById(_id)
+
         if (!task) {
             return res.status(400).send()
         }
+        
+        updates.forEach((update)=>{
+            task[update]=req.body[update]
+         })
+ 
+        task = await task.save()
+
         res.send(task)
     } catch (e) {
+        console.log(e)
         res.status(500).send(e)
     }
 })
 
-router.delete("/tasks/:id", async (req, res) => {
+router.delete("/tasks/:id", auth, async (req, res) => {
     const _id = req.params.id
     try {
-        const task = await Task.findByIdAndDelete(_id)
+        const task = await Task.findOneAndDelete({_id,owner:req.user._id})
         if (!task) {
             return res.status(404).send()
         }
